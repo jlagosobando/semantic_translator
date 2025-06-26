@@ -31,4 +31,4 @@ COPY . .
 
 EXPOSE 5000
 CMD ["./venv/bin/gunicorn", "--bind=0.0.0.0:5000", "--workers=16", "app:app" , "--timeout 0" ]
-#CMD ["./venv/bin/flask", "run", "--port=5001", "--host=0.0.0.0"]
+# CMD ["./venv/bin/flask", "run", "--port=5000", "--host=0.0.0.0"]

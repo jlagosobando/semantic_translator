@@ -5,6 +5,7 @@ import networkx as nx
 
 from solvers import results
 from utils import camel_handler
+from . import attributes
 
 
 class Relationship(pydantic.BaseModel):
@@ -56,7 +57,6 @@ def find_property_by_name(properties: list[dict[str, typing.Any]], name: str):
         None,
     )
 
-
 class Model(pydantic.BaseModel):
     id: uuid.UUID
     name: str
@@ -93,15 +93,12 @@ class Model(pydantic.BaseModel):
                 )
                 is not None
             ):
-                # check the value in the solution
-                if solution[str(elem.id)] >= 1:
+                selected_solution = attributes.get_selected_solution(elem.id, solution)
+                if selected_solution >= 1:
                     sel_prop["value"] = "SelectedForced"
                 else:
                     sel_prop["value"] = "UnselectedForced"
-            # Now check if something happened to the properties
-            # and determine if a value has been set
-            # NOTE: Updated the algorithm since the sel_prop value assigned inside
-            # the if statement was being cached, providing duplicated variations.
+
             for p in elem.properties:
                 if p["id"] in solution:
-                    p["value"] = solution[str(p["id"])]
+                    p["value"] = attributes.translate_from(p, solution)

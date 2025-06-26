@@ -2,7 +2,7 @@ import dataclasses
 import uuid
 import networkx as nx
 import re
-from variamos import model, rules
+from variamos import model, rules, attributes
 from utils import uuid_utils
 from utils import exceptions
 from textx import metamodel_from_file, get_children_of_type
@@ -301,10 +301,10 @@ class VMosCLIFGenerator:
         # added for the types declared.
         # This handles all the element attributes except for attributes with the 'selected' name.
         for property in (p for p in element.properties if p["name"].lower() != 'selected'):
+            p_t = attributes.ATTRIBUTE_PROPERTY_TYPE #property["type"]
             if (
                 element.type not in self.rule_set.attribute_types
-                or (p_t := property["type"])
-                not in self.rule_set.attribute_translation_rules
+                or p_t not in self.rule_set.attribute_translation_rules
             ):
                 raise exceptions.SemanticException(
                     "Unknown attribute type", property["type"]
@@ -317,7 +317,7 @@ class VMosCLIFGenerator:
             # HACK: Handle this special case for feature models
             if rule.value or rule.values:
                 # HACK: Handle the case of string attributes in feature models
-                if p_t == "String":
+                if p_t in ("String", "Integer", "Boolean", "Text", "Date", "Image"):
                     xs = property["possibleValues"].split(",")
                     constraint = constraint.replace("Xs", " ".join(xs))
                 else:

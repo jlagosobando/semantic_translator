@@ -5,6 +5,7 @@ from grammars import clif
 from dataclasses import dataclass, field
 from utils.exceptions import SemanticException
 from functools import singledispatch, singledispatchmethod
+from variamos import attributes
 from targets.solver_model import (
     ArithmeticPredicate,
     CSPArithmeticConstraint,
@@ -80,7 +81,9 @@ class SWIModel:
     def _(self, expr: CSPEnumVariable) -> str:
         if len(expr.values) == 0:
             raise SemanticException("Enum variables must have values")
-        values_list = "[" + ", ".join(expr.values) + "]"
+
+        expr_values = attributes.translate_to(lang=attributes.PROLOG_LANG, values=expr.values)
+        values_list = "[" + ", ".join(expr_values) + "]"
         ints = list(map(str, range(len(expr.values))))
         enum_values_list = "[" + ", ".join(ints) + "]"
         var_bounds = (ints[0], ints[-1])

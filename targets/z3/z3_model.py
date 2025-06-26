@@ -4,6 +4,7 @@ import z3
 import typing
 from grammars import clif
 from functools import singledispatch, singledispatchmethod
+import uuid
 from targets.solver_model import (
     ArithmeticPredicate,
     CSPArithmeticConstraint,
@@ -19,6 +20,7 @@ from targets.solver_model import (
     SolverModel,
     TypePredType,
 )
+from variamos import attributes
 from utils.exceptions import SemanticException
 from dataclasses import dataclass, field
 
@@ -122,7 +124,10 @@ class Z3Model:
     def _construct_z3_enum_var(var: CSPEnumVariable):
         if isinstance(var, CSPEnumVariable):
             # Construct an enum for the context variable
-            EnumConstructor, EnumConstants = z3.EnumSort(var.name, var.values)
+
+            var.values = attributes.translate_to(lang=attributes.Z3_LANG, values=var.values)
+            unique_name = "enum_{}".format(uuid.uuid4().hex)
+            EnumConstructor, EnumConstants = z3.EnumSort(unique_name, var.values)
             return (
                 zip(var.values, EnumConstants),
                 z3_var := z3.Const(var.name + "_const", EnumConstructor),

@@ -4,6 +4,7 @@ from __future__ import annotations
 from grammars import clif
 from dataclasses import dataclass, field
 from functools import singledispatch, singledispatchmethod
+from variamos import attributes
 from targets.solver_model import (
     ArithmeticPredicate,
     CSPArithmeticConstraint,
@@ -84,7 +85,8 @@ class MZNModel:
         enum_name = f"enum_{''.join(random.choices(string.ascii_letters, k=10))}"
         # create the enum declaration
         # PS why the triple brackets?
-        enum_decl_str = f"enum {enum_name} = {{{', '.join(expr.values)}}}"
+        expr_values = attributes.translate_to(lang=attributes.MINIZINC_LANG, values=expr.values)
+        enum_decl_str = f"enum {enum_name} = {{{', '.join(expr_values)}}}"
         # render the final string
         qvar = self.quote_var(expr.name)
         # TODO: handle the case where the variable is fixed

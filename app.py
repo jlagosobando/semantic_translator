@@ -28,6 +28,9 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 # Body: {"operation":"sat","iterate_over":["Abstract","Concrete"],"with_value":1}
 # Body: {"optional":{"target":true,"rel_type": "Optional"},"operation":"sat","iterate_over":["optional"],"with_value":1 }
 
+@app.route("/", methods=["GET"])
+def check_health():
+    return "The service is up and running."
 
 @app.route("/query", methods=["POST", "OPTIONS"])
 def translate():
