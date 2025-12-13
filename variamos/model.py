@@ -99,6 +99,6 @@ class Model(pydantic.BaseModel):
                 else:
                     sel_prop["value"] = "UnselectedForced"
 
-            for p in elem.properties:
-                if p["id"] in solution:
-                    p["value"] = attributes.translate_from(p, solution)
+            for property in elem.properties:
+                if property["id"] in solution:
+                    property["value"] = attributes.translate_from(property, solution)

@@ -39,13 +39,14 @@ class VMosCLIFGenerator:
         # we will gather all the ids and names in a data structure.
         names_ids = []
         for element_id, element in self.variamos_graph.nodes.data("element"):  # type: ignore
-            if element.type in self.rule_set.element_types or element.type in self.rule_set.relation_reification_types or element.type in self.rule_set.hierarchy_types: 
+            if element.type in self.rule_set.element_types or element.type in self.rule_set.relation_reification_types or element.type in self.rule_set.hierarchy_types:
                 # Frist make the sentece for the element itself
                 e_sentence = self.generate_element_sentence(
                     element_id=element_id, element=element  # type: ignore
                 )
                 if e_sentence is not None:
                     sentence_strings.append(e_sentence)
+
                 # Next make the sentence for the element's attributes
                 attr_sentences = list(
                     s
@@ -301,25 +302,32 @@ class VMosCLIFGenerator:
         # added for the types declared.
         # This handles all the element attributes except for attributes with the 'selected' name.
         for property in (p for p in element.properties if p["name"].lower() != 'selected'):
-            p_t = attributes.ATTRIBUTE_PROPERTY_TYPE #property["type"]
-            if (
-                element.type not in self.rule_set.attribute_types
-                or p_t not in self.rule_set.attribute_translation_rules
-            ):
+            if element.type not in self.rule_set.attribute_types:
+                continue
+
+            property_type = property["type"]
+            possible_values = property["possibleValues"]
+
+            if possible_values:
+                property_type = attributes.ATTRIBUTE_PROPERTY_TYPE
+
+            if property_type not in list(self.rule_set.attribute_translation_rules.keys()):
                 raise exceptions.SemanticException(
-                    "Unknown attribute type", property["type"]
+                    "Unknown attribute type", property_type
                 )
-            rule = self.rule_set.attribute_translation_rules[p_t]
+
+            rule = self.rule_set.attribute_translation_rules[property_type]
             constraint = rule.constraint.replace(
                 rule.template,
                 uuid_utils.to_underscore_from_uuid(property[rule.param]),
             )
+
             # HACK: Handle this special case for feature models
             if rule.value or rule.values:
                 # HACK: Handle the case of string attributes in feature models
-                if p_t in ("String", "Integer", "Boolean"):
-                    xs = property["possibleValues"].split(",")
-                    constraint = constraint.replace("Xs", " ".join(xs))
+                if property["type"] in ("String", "Integer", "Boolean") and possible_values:
+                    possible_values_list = possible_values.split(",")
+                    constraint = constraint.replace("Xs", " ".join(possible_values_list))
                 else:
                     # handle the case where the prop is None
                     if property["value"] is None:

@@ -91,6 +91,7 @@ class QueryHandler:
         print(sys.getrecursionlimit())
         sys.setrecursionlimit(10000000)
         print(sys.getrecursionlimit())
+        print("---> self.clif_str", self.clif_str)
         clif_model: clif.Text = clif_mm.model_from_str(self.clif_str)
         return clif_model
 

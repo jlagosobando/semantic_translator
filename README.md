@@ -34,13 +34,13 @@ If you want to run the project locally, you have to follow the next instructions
 ### 1. Create a virtual environment
 
 ```bash
-python -m venv venv
+python -m venv env
 ```
 
 ### 2. Activate your virtual environment
 
 ```bash
-./venv/bin/activate
+. ./env/bin/activate
 ```
 
 ### 3. Install the requirements
@@ -53,3 +53,9 @@ pip install -r requirements.txt
 ```bash
 ../venv/bin/flask run --port=5001 --host=0.0.0.0
 ```
+
+## Background research
+
+### Where does the semantic_translator update the resulting JSON to show the different variations?
+
+The resulting JSON is updated on the `variamos/model.py` under the `update_selections` function.

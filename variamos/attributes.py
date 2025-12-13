@@ -20,9 +20,11 @@ def get_selected_solution(element_id, solution):
 
 def translate_from(current_solution, solution):
     solution_value = solution[str(current_solution["id"])]
-    
-    if type(solution_value) == int:
-        return current_solution["possibleValues"].split(",")[solution_value].lower()
+    possible_values = current_solution["possibleValues"]
+    if type(solution_value) == int and current_solution["type"] == "Boolean":
+        return "true" if solution_value == 1 else "false"
+    elif type(solution_value) == int and possible_values:
+        return possible_values.split(",")[solution_value].lower()
     elif str(solution_value)[:2] == "a_":
         return str(solution_value).replace("a_", "")
     
