@@ -317,7 +317,7 @@ class VMosCLIFGenerator:
             # HACK: Handle this special case for feature models
             if rule.value or rule.values:
                 # HACK: Handle the case of string attributes in feature models
-                if p_t in ("String", "Integer", "Boolean", "Text", "Date", "Image"):
+                if p_t in ("String", "Integer", "Boolean"):
                     xs = property["possibleValues"].split(",")
                     constraint = constraint.replace("Xs", " ".join(xs))
                 else:

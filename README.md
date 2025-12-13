@@ -27,3 +27,29 @@ docker stop semantic_translator && docker rm semantic_translator && docker build
 
 This command will stop the current container, remove the previous image and will recreate new ones based on the cached libraries already installed on the previous image. It should take less time that the first time you ran the build command.
 
+## Run Locally
+
+If you want to run the project locally, you have to follow the next instructions.
+
+### 1. Create a virtual environment
+
+```bash
+python -m venv venv
+```
+
+### 2. Activate your virtual environment
+
+```bash
+./venv/bin/activate
+```
+
+### 3. Install the requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run the flask server
+```bash
+../venv/bin/flask run --port=5001 --host=0.0.0.0
+```
