@@ -349,9 +349,14 @@ class VMosCLIFGenerator:
                     # Get the actual value of the property
                     else:
                         if rule.value is not None:
+                            replacement_value = property["value"]
+                            if isinstance(replacement_value, str):
+                                replacement_value = self._normalize_clif_term(
+                                    replacement_value
+                                )
                             constraint = constraint.replace(
                                 rule.value,
-                                str(property["value"]),
+                                str(replacement_value),
                             )
                         elif rule.values is not None:
                             value = property["value"]
