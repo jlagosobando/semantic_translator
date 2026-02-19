@@ -30,7 +30,7 @@
     "ConcreteFeature"
   ],
   "attributeTranslationRules": {
-    "Integer":{
+    "Integer": {
       "parent": "F",
       "param": "id",
       "template": "A",
@@ -38,18 +38,25 @@
       "constraint": "(and (int UUID_A) (= UUID_A V))",
       "unsetConstraint": "(int UUID_A)"
     },
-    "String":{
-      "parent":"F",
+    "String": {
+      "parent": "F",
       "param": "id",
       "template": "A",
       "values": "Xs",
       "constraint": "(enum (Xs) UUID_A)"
     },
-    "Boolean":{
-      "parent":"F",
+    "Float": {
+      "parent": "F",
       "param": "id",
       "template": "A",
-      "constraint":"(bool UUID_A)"
+      "values": "Xs",
+      "constraint": "(enum (Xs) UUID_A)"
+    },
+    "Boolean": {
+      "parent": "F",
+      "param": "id",
+      "template": "A",
+      "constraint": "(bool UUID_A)"
     }
   },
   "typingRelationTypes": [
@@ -77,8 +84,8 @@
       "constraint": "(and (int (min max) UUID_F2) (if (>= UUID_F2 1) (>= UUID_F1 1)) (and (=< min UUID_F2) (=< UUID_F2 max) ))"
     }
   },
-  "hierarchyTypes":[],
-  "hierarchyTranslationRules":{},
+  "hierarchyTypes": [],
+  "hierarchyTranslationRules": {},
   "relationTypes": [
     "Mandatory",
     "Optional",
@@ -92,7 +99,7 @@
   "relationReificationTypes": [
     "Bundle"
   ],
-  "relationReificationTranslationRules":{
+  "relationReificationTranslationRules": {
     "Bundle": {
       "param": [
         "F",

@@ -308,7 +308,7 @@ class VMosCLIFGenerator:
             property_type = property["type"]
             possible_values = property["possibleValues"]
 
-            if possible_values:
+            if possible_values and property_type != "Float":
                 property_type = attributes.ATTRIBUTE_PROPERTY_TYPE
 
             if property_type not in list(self.rule_set.attribute_translation_rules.keys()):
@@ -325,9 +325,17 @@ class VMosCLIFGenerator:
             # HACK: Handle this special case for feature models
             if rule.value or rule.values:
                 # HACK: Handle the case of string attributes in feature models
-                if property["type"] in ("String", "Integer", "Boolean") and possible_values:
-                    possible_values_list = possible_values.split(",")
-                    constraint = constraint.replace("Xs", " ".join(possible_values_list))
+                if property["type"] in ("String", "Integer", "Boolean", "Float") and possible_values:
+                    possible_values_list = [
+                        self._normalize_clif_term(value)
+                        for value in possible_values.split(",")
+                        if value.strip()
+                    ]
+                    if rule.values is not None:
+                        constraint = constraint.replace(
+                            rule.values,
+                            " ".join(possible_values_list),
+                        )
                 else:
                     # handle the case where the prop is None
                     if property["value"] is None:
@@ -340,7 +348,30 @@ class VMosCLIFGenerator:
                             )
                     # Get the actual value of the property
                     else:
-                        constraint = constraint.replace(rule.value, str(property["value"]))
+                        if rule.value is not None:
+                            constraint = constraint.replace(
+                                rule.value,
+                                str(property["value"]),
+                            )
+                        elif rule.values is not None:
+                            value = property["value"]
+                            if isinstance(value, list):
+                                value_tokens = [
+                                    self._normalize_clif_term(v)
+                                    for v in value
+                                ]
+                            elif isinstance(value, str) and "," in value:
+                                value_tokens = [
+                                    self._normalize_clif_term(v)
+                                    for v in value.split(",")
+                                    if v.strip()
+                                ]
+                            else:
+                                value_tokens = [self._normalize_clif_term(value)]
+                            constraint = constraint.replace(
+                                rule.values,
+                                " ".join(value_tokens),
+                            )
             if constraint is not None:
                 constraint = constraint.replace(
                     rule.parent, uuid_utils.to_underscore_from_uuid(element.id)
@@ -373,6 +404,25 @@ class VMosCLIFGenerator:
 
                 sentences.append(constraint)
         return sentences
+
+    def _normalize_clif_term(self, value) -> str:
+        term = str(value).strip()
+        if self.rule_set.symbol_map is not None and term in self.rule_set.symbol_map:
+            term = self.rule_set.symbol_map[term]
+
+        if re.fullmatch(r"-?\d+", term):
+            return term
+
+        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", term):
+            return term
+
+        normalized = re.sub(r"\W", "_", term)
+        normalized = re.sub(r"_+", "_", normalized).strip("_")
+        if len(normalized) == 0:
+            normalized = "VALUE"
+        if normalized[0].isdigit():
+            normalized = f"V_{normalized}"
+        return normalized
 
     def generate_reified_element_sentence(
         self, element_id: uuid.UUID, element: model.Element
