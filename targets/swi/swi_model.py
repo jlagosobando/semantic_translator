@@ -1,6 +1,7 @@
 # pyright: strict
 from __future__ import annotations
 import typing
+import re
 from grammars import clif
 from dataclasses import dataclass, field
 from utils.exceptions import SemanticException
@@ -171,7 +172,23 @@ def _(term: int) -> str:
 
 @render_swi_expression.register(str)
 def _(term: str) -> str:
-    return str(term)
+    token = str(term)
+    if token.startswith("UUID_"):
+        return token
+    if re.fullmatch(r"-?\d+", token):
+        return token
+
+    token = token.lower()
+    if re.fullmatch(r"[a-z_][a-z0-9_]*", token):
+        return token
+
+    token = re.sub(r"\W", "_", token)
+    token = re.sub(r"_+", "_", token).strip("_")
+    if len(token) == 0:
+        token = "value"
+    if token[0].isdigit():
+        token = f"v_{token}"
+    return token
 
 @render_swi_expression.register(clif.ArithmeticExpr)
 def _(term: clif.ArithmeticExpr) -> str:
