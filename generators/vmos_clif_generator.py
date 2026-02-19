@@ -594,7 +594,9 @@ class VMosCLIFGenerator:
                                 and attribute in self.rule_set.symbol_map
                             ):
                                 attribute = self.rule_set.symbol_map[attribute]
-                            constraint = constraint.replace(expression, attribute)
+                            if isinstance(attribute, str):
+                                attribute = self._normalize_clif_term(attribute)
+                            constraint = constraint.replace(expression, str(attribute))
                         else:
                             raise exceptions.SemanticException(
                                 f"The {attribute}"
@@ -707,8 +709,11 @@ class VMosCLIFGenerator:
                                         and attribute in self.rule_set.symbol_map
                                     ):
                                         attribute = self.rule_set.symbol_map[attribute]
+                                    if isinstance(attribute, str):
+                                        attribute = self._normalize_clif_term(attribute)
                                     new_inner_expr = new_inner_expr.replace(
-                                        attr_lookup["expression"], attribute
+                                        attr_lookup["expression"],
+                                        str(attribute),
                                     )
                                 else:
                                     raise exceptions.SemanticException(
