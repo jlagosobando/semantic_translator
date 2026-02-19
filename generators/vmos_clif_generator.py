@@ -413,15 +413,16 @@ class VMosCLIFGenerator:
         if re.fullmatch(r"-?\d+", term):
             return term
 
-        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", term):
-            return term
+        normalized = term.lower()
+        if re.fullmatch(r"[a-z_][a-z0-9_]*", normalized):
+            return normalized
 
-        normalized = re.sub(r"\W", "_", term)
+        normalized = re.sub(r"\W", "_", normalized)
         normalized = re.sub(r"_+", "_", normalized).strip("_")
         if len(normalized) == 0:
-            normalized = "VALUE"
+            normalized = "value"
         if normalized[0].isdigit():
-            normalized = f"V_{normalized}"
+            normalized = f"v_{normalized}"
         return normalized
 
     def generate_reified_element_sentence(
